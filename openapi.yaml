@@ -1,0 +1,84 @@
+openapi: 3.1.0
+info:
+  title: Temu and AliExpress Price Comparison API
+  description: Fetches real-time item prices, shipping estimates, and seller ratings across Temu and AliExpress.
+  version: 1.0.0
+servers:
+  - url: https://your-deployment-domain.com
+paths:
+  /search:
+    get:
+      operationId: comparePrices
+      summary: Query Temu and AliExpress for the best product prices
+      description: Returns a sorted list of products ranked from lowest to highest total price (price + shipping).
+      parameters:
+        - name: query
+          in: query
+          description: Search keywords for the item requested by the user.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully fetched and ranked product deals.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDeal'
+        '404':
+          description: No matching products found across either platform.
+components:
+  schemas:
+    ProductDeal:
+      type: object
+      required:
+        - title
+        - platform
+        - price
+        - shipping_cost
+        - total_price
+        - currency
+        - product_url
+        - image_url
+      properties:
+        title:
+          type: string
+          description: Product listing title.
+        platform:
+          type: string
+          enum: [Temu, AliExpress]
+          description: Source marketplace platform.
+        price:
+          type: number
+          format: float
+          description: Base item price in USD.
+        shipping_cost:
+          type: number
+          format: float
+          description: Shipping fee in USD.
+        total_price:
+          type: number
+          format: float
+          description: Sum of base price and shipping cost.
+        currency:
+          type: string
+          example: USD
+        rating:
+          type: number
+          format: float
+          nullable: true
+          description: Average product rating out of 5.
+        units_sold:
+          type: integer
+          nullable: true
+          description: Estimated quantity sold.
+        product_url:
+          type: string
+          format: uri
+          description: Direct link to item page.
+        image_url:
+          type: string
+          format: uri
+          description: Product thumbnail image URL.
